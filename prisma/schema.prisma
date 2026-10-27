@@ -1,0 +1,41 @@
+// Esquema para la fase de backend (persistencia + cuentas). El MVP actual funciona 100% offline
+// con localStorage; este esquema permite migrar cuando se agregue API/Auth.js.
+generator client { provider = "prisma-client-js" }
+datasource db { provider = "postgresql"; url = env("DATABASE_URL") }
+
+model User {
+  id          String       @id @default(uuid())
+  email       String?      @unique // null = invitado
+  createdAt   DateTime     @default(now()) @map("created_at")
+  assessments Assessment[]
+  @@map("users")
+}
+
+model Question {
+  id       String @id
+  category String // canal | atencion | ritmo | emocional
+  text     String
+  options  Json   // [{ label, weights: { dim: n } }] — definidos por el equipo multidisciplinario
+  @@map("questions")
+}
+
+model LearningProfile {
+  id              String       @id @default(uuid())
+  archetypeName   String       @unique @map("archetype_name")
+  description     String
+  recommendations Json
+  assessments     Assessment[]
+  @@map("learning_profiles")
+}
+
+model Assessment {
+  id          String           @id @default(uuid())
+  userId      String?          @map("user_id")
+  user        User?            @relation(fields: [userId], references: [id])
+  profileId   String?          @map("profile_id")
+  profile     LearningProfile? @relation(fields: [profileId], references: [id])
+  completedAt DateTime?        @map("completed_at")
+  rawScores   Json             @map("raw_scores")
+  studyPlan   Json?            @map("study_plan")
+  @@map("assessments")
+}

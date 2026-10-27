@@ -1,0 +1,313 @@
+{
+  "version": "1.0.0",
+  "dimensions": [
+    { "id": "visual", "label": "Visual", "group": "canal" },
+    { "id": "auditivo", "label": "Auditivo", "group": "canal" },
+    { "id": "lectoescritura", "label": "Lectoescritura", "group": "canal" },
+    { "id": "kinestesico", "label": "Kinestésico", "group": "canal" },
+    { "id": "atencion", "label": "Atención sostenida", "group": "ejecutiva" },
+    { "id": "organizacion", "label": "Organización del tiempo", "group": "ejecutiva" },
+    { "id": "ansiedad", "label": "Ansiedad ante exámenes", "group": "emocional" }
+  ],
+  "thresholds": {
+    "multimodalGap": 8,
+    "attentionLow": 45,
+    "attentionHigh": 70,
+    "organizationLow": 45,
+    "anxietyHigh": 50,
+    "anxietyLow": 20
+  },
+  "tieBreakOrder": ["visual", "auditivo", "lectoescritura", "kinestesico"],
+  "games": {
+    "sequence": { "maxPoints": 3, "dims": ["visual", "atencion"] },
+    "pattern": { "maxPoints": 3, "dims": ["atencion"] }
+  },
+  "questions": [
+    {
+      "id": "q1", "category": "canal",
+      "text": "Al estudiar un tema nuevo, lo que más me ayuda es…",
+      "options": [
+        { "label": "Ver un esquema, diagrama o video", "weights": { "visual": 3 } },
+        { "label": "Escuchar una explicación", "weights": { "auditivo": 3 } },
+        { "label": "Leer el texto y subrayar", "weights": { "lectoescritura": 3 } },
+        { "label": "Probarlo con un ejemplo o ejercicio práctico", "weights": { "kinestesico": 3 } }
+      ]
+    },
+    {
+      "id": "q2", "category": "canal",
+      "text": "Para recordar una fórmula o un dato, normalmente…",
+      "options": [
+        { "label": "Recuerdo cómo se veía: colores, posición en la página", "weights": { "visual": 3 } },
+        { "label": "Me lo repito en voz alta o mentalmente", "weights": { "auditivo": 3 } },
+        { "label": "Lo escribo varias veces", "weights": { "lectoescritura": 3 } },
+        { "label": "Lo aplico en problemas hasta que me sale solo", "weights": { "kinestesico": 3 } }
+      ]
+    },
+    {
+      "id": "q3", "category": "canal",
+      "text": "En clase me concentro más cuando…",
+      "options": [
+        { "label": "Hay pizarra, gráficos o presentaciones", "weights": { "visual": 3 } },
+        { "label": "El profesor explica con historias y ejemplos orales", "weights": { "auditivo": 3 } },
+        { "label": "Puedo tomar apuntes detallados", "weights": { "lectoescritura": 3 } },
+        { "label": "Hay actividades, laboratorios o dinámicas", "weights": { "kinestesico": 3 } }
+      ]
+    },
+    {
+      "id": "q4", "category": "canal",
+      "text": "Si debo explicar un tema a un amigo, prefiero…",
+      "options": [
+        { "label": "Dibujarlo o hacer un esquema", "weights": { "visual": 3 } },
+        { "label": "Contárselo conversando", "weights": { "auditivo": 3 } },
+        { "label": "Escribirle un resumen claro", "weights": { "lectoescritura": 3 } },
+        { "label": "Hacer una demostración con objetos o ejemplos", "weights": { "kinestesico": 3 } }
+      ]
+    },
+    {
+      "id": "q5", "category": "canal",
+      "text": "Mis apuntes suelen tener…",
+      "options": [
+        { "label": "Colores, flechas y dibujos", "weights": { "visual": 3 } },
+        { "label": "Pocas notas porque prefiero escuchar", "weights": { "auditivo": 2, "kinestesico": 1 } },
+        { "label": "Párrafos completos y listas ordenadas", "weights": { "lectoescritura": 3 } },
+        { "label": "Ejemplos resueltos y casos prácticos", "weights": { "kinestesico": 3 } }
+      ]
+    },
+    {
+      "id": "q6", "category": "canal",
+      "text": "Cuando me atasco con un problema…",
+      "options": [
+        { "label": "Busco un gráfico o video que lo muestre", "weights": { "visual": 3 } },
+        { "label": "Lo converso con alguien", "weights": { "auditivo": 3 } },
+        { "label": "Releo la teoría con calma", "weights": { "lectoescritura": 3 } },
+        { "label": "Pruebo distintas cosas hasta que sale", "weights": { "kinestesico": 3 } }
+      ]
+    },
+    {
+      "id": "q7", "category": "atencion",
+      "text": "¿Cuánto tiempo puedes estudiar seguido antes de distraerte?",
+      "options": [
+        { "label": "Menos de 15 minutos", "weights": { "atencion": 0 } },
+        { "label": "Entre 15 y 25 minutos", "weights": { "atencion": 1 } },
+        { "label": "Entre 25 y 45 minutos", "weights": { "atencion": 2 } },
+        { "label": "Más de 45 minutos", "weights": { "atencion": 3 } }
+      ]
+    },
+    {
+      "id": "q8", "category": "atencion",
+      "text": "Mientras estudio, mi celular…",
+      "options": [
+        { "label": "Está en mi mano y lo reviso seguido", "weights": { "atencion": 0 } },
+        { "label": "Está cerca y lo miro de vez en cuando", "weights": { "atencion": 1 } },
+        { "label": "Está en silencio, boca abajo", "weights": { "atencion": 2 } },
+        { "label": "Está en otra habitación o en modo no molestar", "weights": { "atencion": 3 } }
+      ]
+    },
+    {
+      "id": "q9", "category": "atencion",
+      "text": "Cuando algo me distrae, volver a la tarea…",
+      "options": [
+        { "label": "Me cuesta muchísimo", "weights": { "atencion": 0 } },
+        { "label": "Me toma varios minutos", "weights": { "atencion": 1 } },
+        { "label": "Me toma un momento", "weights": { "atencion": 2 } },
+        { "label": "Es casi inmediato", "weights": { "atencion": 3 } }
+      ]
+    },
+    {
+      "id": "q10", "category": "atencion",
+      "text": "Después de una hora seguida de estudio…",
+      "options": [
+        { "label": "Estoy agotado y casi no retengo nada", "weights": { "atencion": 0 } },
+        { "label": "Rindo mucho menos que al inicio", "weights": { "atencion": 1 } },
+        { "label": "Bajo un poco el ritmo, pero sigo", "weights": { "atencion": 2 } },
+        { "label": "Mantengo el mismo nivel", "weights": { "atencion": 3 } }
+      ]
+    },
+    {
+      "id": "q11", "category": "ritmo",
+      "text": "Cuando me dan la fecha de un examen, suelo…",
+      "options": [
+        { "label": "Hacer un plan y empezar ese mismo día", "weights": { "organizacion": 3 } },
+        { "label": "Empezar unos días después", "weights": { "organizacion": 2 } },
+        { "label": "Estudiar sobre todo la última semana", "weights": { "organizacion": 1 } },
+        { "label": "Dejarlo para la noche anterior", "weights": { "organizacion": 0 } }
+      ]
+    },
+    {
+      "id": "q12", "category": "ritmo",
+      "text": "Mi planificación de estudio es…",
+      "options": [
+        { "label": "Escrita y revisada cada semana", "weights": { "organizacion": 3 } },
+        { "label": "Tengo un plan, pero a veces no lo cumplo", "weights": { "organizacion": 2 } },
+        { "label": "Solo una idea mental", "weights": { "organizacion": 1 } },
+        { "label": "Improvisada", "weights": { "organizacion": 0 } }
+      ]
+    },
+    {
+      "id": "q13", "category": "ritmo",
+      "text": "Ante un temario muy extenso, yo…",
+      "options": [
+        { "label": "Lo divido en partes y las reparto en días", "weights": { "organizacion": 3 } },
+        { "label": "Lo leo todo de corrido, de principio a fin", "weights": { "organizacion": 1 } },
+        { "label": "Empiezo por lo que más me gusta", "weights": { "organizacion": 1 } },
+        { "label": "Me bloqueo y lo pospongo", "weights": { "organizacion": 0 } }
+      ]
+    },
+    {
+      "id": "q14", "category": "ritmo",
+      "text": "¿Con qué frecuencia te autoevalúas (preguntas, tarjetas, simulacros)?",
+      "options": [
+        { "label": "Casi nunca", "weights": { "organizacion": 0 } },
+        { "label": "Solo antes del examen", "weights": { "organizacion": 1 } },
+        { "label": "Una vez por semana", "weights": { "organizacion": 2 } },
+        { "label": "Varias veces por semana", "weights": { "organizacion": 3 } }
+      ]
+    },
+    {
+      "id": "q15", "category": "emocional",
+      "text": "En los días previos a un examen siento…",
+      "options": [
+        { "label": "Tranquilidad", "weights": { "ansiedad": 0 } },
+        { "label": "Nervios manejables", "weights": { "ansiedad": 1 } },
+        { "label": "Mucha tensión y dificultad para dormir", "weights": { "ansiedad": 2 } },
+        { "label": "Angustia que me paraliza", "weights": { "ansiedad": 3 } }
+      ]
+    },
+    {
+      "id": "q16", "category": "emocional",
+      "text": "Durante el examen me pasa que…",
+      "options": [
+        { "label": "Recuerdo bien lo que estudié", "weights": { "ansiedad": 0 } },
+        { "label": "Me pongo nervioso al inicio y luego se pasa", "weights": { "ansiedad": 1 } },
+        { "label": "Se me va la mente en blanco en algunas preguntas", "weights": { "ansiedad": 2 } },
+        { "label": "Me bloqueo y me cuesta continuar", "weights": { "ansiedad": 3 } }
+      ]
+    },
+    {
+      "id": "q17", "category": "emocional",
+      "text": "Cuando saco una nota más baja de la esperada…",
+      "options": [
+        { "label": "Analizo qué falló y ajusto mi método", "weights": { "ansiedad": 0 } },
+        { "label": "Me frustro un rato, pero sigo", "weights": { "ansiedad": 1 } },
+        { "label": "Me desanimo y evito estudiar por unos días", "weights": { "ansiedad": 2 } },
+        { "label": "Pienso que no soy bueno para estudiar", "weights": { "ansiedad": 3 } }
+      ]
+    }
+  ],
+  "flow": [
+    "q1", "q2", "q3", "q4", "q5", "q6", "game:sequence",
+    "q7", "q8", "q9", "q10", "game:pattern",
+    "q11", "q12", "q13", "q14", "q15", "q16", "q17"
+  ],
+  "archetypes": {
+    "visual": {
+      "name": "Arquitecto Visual",
+      "tagline": "Piensas en imágenes: estructura, color y mapas.",
+      "description": "Tu mente procesa mejor la información cuando puede verla organizada espacialmente. Los esquemas, mapas conceptuales y códigos de color convierten un temario abstracto en algo que puedes recorrer mentalmente.",
+      "strengths": ["Captas relaciones entre conceptos con rapidez", "Recuerdas la posición y el aspecto de la información", "Sintetizas temarios largos en una sola página"],
+      "watchouts": ["Textos largos sin apoyo gráfico te cansan", "Puedes dedicar demasiado tiempo a 'embellecer' apuntes"],
+      "techniques": ["Mapas conceptuales", "Código de colores por tema", "Líneas de tiempo", "Tarjetas con dibujo"]
+    },
+    "auditivo": {
+      "name": "Narrador Auditivo",
+      "tagline": "Aprendes cuando algo se dice, se discute o se cuenta.",
+      "description": "Tu canal más fuerte es el oído. Explicar en voz alta, debatir y escuchar te ayuda a fijar la información y detectar lagunas que en silencio pasarías por alto.",
+      "strengths": ["Retienes explicaciones orales", "Aprendes bien en grupo o conversando", "Detectas incoherencias al explicar"],
+      "watchouts": ["El silencio prolongado baja tu rendimiento", "Puedes confiar demasiado en 'lo que recuerdas haber oído'"],
+      "techniques": ["Técnica Feynman en voz alta", "Grabar y escuchar resúmenes", "Grupos de estudio de preguntas", "Mnemotecnias rítmicas"]
+    },
+    "lectoescritura": {
+      "name": "Estratega Lector-Escritor",
+      "tagline": "Ordenas tus ideas con palabras: leer, resumir, reescribir.",
+      "description": "Procesas con profundidad a través del texto. Reformular con tus propias palabras, hacer listas y redactar respuestas te permite comprender y recordar con precisión.",
+      "strengths": ["Resúmenes claros y precisos", "Buena comprensión de textos densos", "Facilidad para exámenes de desarrollo"],
+      "watchouts": ["Releer y subrayar da falsa sensación de dominio", "Puedes posponer la práctica por seguir 'preparando' apuntes"],
+      "techniques": ["Método Cornell", "Resúmenes en tus palabras", "Preguntas de examen redactadas", "Diario de errores"]
+    },
+    "kinestesico": {
+      "name": "Constructor Kinestésico",
+      "tagline": "Aprendes haciendo: practicar, mover, experimentar.",
+      "description": "Comprendes cuando puedes aplicar. Resolver problemas, simular situaciones y moverte mientras repasas convierte la teoría en experiencia concreta.",
+      "strengths": ["Aprendes rápido con práctica guiada", "Gran memoria de procedimientos", "Energía para sesiones activas"],
+      "watchouts": ["Estar quieto leyendo te agota", "Puedes saltarte la teoría base"],
+      "techniques": ["Resolver problemas sin mirar la solución", "Casos y simulacros", "Repasar caminando", "Tarjetas físicas que se ordenan"]
+    },
+    "multimodal": {
+      "name": "Explorador Multimodal",
+      "tagline": "Combinas varios canales con flexibilidad.",
+      "description": "No hay un canal que domine claramente: te adaptas a diferentes formatos. Tu ventaja es poder rotar canales para reforzar la misma información de varias maneras, lo que fortalece la memoria.",
+      "strengths": ["Flexibilidad para distintos tipos de materia", "Puedes reforzar un tema por varias vías", "Menor dependencia de un solo formato"],
+      "watchouts": ["Cambiar de método sin criterio dispersa", "Te cuesta decidir 'cómo empezar'"],
+      "techniques": ["Esquema + explicación oral", "Resumen escrito + práctica", "Rotar canal por bloque", "Enseñar a otra persona"]
+    }
+  },
+  "modifiers": {
+    "lowAttention": {
+      "title": "Atención en bloques cortos",
+      "tips": ["Usa bloques de 20 minutos con pausas de 5", "Deja el celular en otra habitación", "Empieza cada bloque con un objetivo de una línea", "Si te distraes, anota la distracción y vuelve a la tarea"]
+    },
+    "highAttention": {
+      "title": "Atención sostenida",
+      "tips": ["Aprovecha bloques profundos de 40 minutos", "Reserva tu mejor hora del día para lo más difícil", "Respeta las pausas aunque no las necesites"]
+    },
+    "lowOrganization": {
+      "title": "Estructura externa",
+      "tips": ["Un plan escrito con tareas diarias pequeñas", "Define cuándo y dónde empiezas (intención de implementación)", "Regla de los 2 minutos: empieza solo 2 minutos y decide después", "Revisa el plan cada noche en 3 minutos"]
+    },
+    "highAnxiety": {
+      "title": "Autorregulación emocional",
+      "tips": ["Respiración 4-6 antes de cada sesión y del examen", "Pausas activas: camina, estira, hidrátate", "Simulacros graduales para ganar familiaridad", "Reencuadre: 'estoy activado' en lugar de 'me voy a bloquear'", "Duerme 7–8 horas la noche previa; no estudies contenido nuevo el último día"]
+    }
+  },
+  "playbook": {
+    "mapeo": {
+      "title": "Mapeo del temario",
+      "goal": "Ver el territorio completo y priorizar.",
+      "general": ["Lista todos los temas del examen y califica cada uno de 1 a 3 según tu dominio", "Prioriza los temas de mayor peso y menor dominio"],
+      "visual": ["Dibuja un mapa general del temario con colores por bloque"],
+      "auditivo": ["Cuéntale a alguien en voz alta de qué trata el examen y qué temas ves"],
+      "lectoescritura": ["Redacta un índice comentado con una frase por tema"],
+      "kinestesico": ["Reúne exámenes anteriores y resuelve 3 preguntas en frío para ver tu punto de partida"]
+    },
+    "aprendizaje": {
+      "title": "Aprendizaje activo",
+      "goal": "Comprender y construir tu propia versión de cada tema.",
+      "general": ["Lee el tema una vez y cierra el material: escribe lo que recuerdas", "Convierte cada subtítulo en una pregunta y respóndela"],
+      "visual": ["Convierte el tema en un esquema o mapa conceptual de una hoja", "Crea tarjetas con dibujo o diagrama en el reverso"],
+      "auditivo": ["Explica el tema en voz alta como si dieras clase (Feynman)", "Graba un audio de 2 minutos con el resumen"],
+      "lectoescritura": ["Haz notas Cornell: preguntas a la izquierda, resumen abajo", "Reescribe el tema con tus palabras en media página"],
+      "kinestesico": ["Resuelve ejercicios del tema antes de revisar la teoría", "Explica caminando y usa objetos para representar los conceptos"]
+    },
+    "recuperacion": {
+      "title": "Recuperación activa",
+      "goal": "Practicar traer la información de memoria, con espaciado.",
+      "general": ["Autoevaluación sin apuntes y corrección posterior", "Repasa primero lo que fallaste ayer (repetición espaciada)"],
+      "visual": ["Redibuja el esquema de memoria y compara con el original", "Usa tarjetas con la imagen oculta"],
+      "auditivo": ["Responde preguntas en voz alta con un compañero o frente al espejo", "Escucha tus audios y completa las frases que dejaste en blanco"],
+      "lectoescritura": ["Redacta respuestas de examen cronometradas", "Actualiza tu diario de errores con la causa de cada fallo"],
+      "kinestesico": ["Resuelve problemas variados mezclando temas (práctica intercalada)", "Ordena tarjetas físicas por tema de memoria"]
+    },
+    "simulacro": {
+      "title": "Simulacro y ajuste",
+      "goal": "Ensayar las condiciones reales del examen y corregir.",
+      "general": ["Hazlo con tiempo real, sin apuntes ni celular", "Corrige y clasifica errores: concepto, descuido o tiempo"],
+      "visual": ["Marca con colores los tipos de error en tu simulacro"],
+      "auditivo": ["Comenta en voz alta tus errores con alguien y cómo los evitarás"],
+      "lectoescritura": ["Escribe una lista de 'reglas de oro' a partir de tus errores"],
+      "kinestesico": ["Repite sólo los problemas que fallaste hasta resolverlos sin ayuda"]
+    },
+    "final": {
+      "title": "Repaso ligero y descanso",
+      "goal": "Consolidar sin agotarte.",
+      "general": ["Repasa tu resumen de una hoja y tu diario de errores", "Prepara materiales y rutina de la mañana del examen", "No empieces temas nuevos"],
+      "visual": ["Mira tu mapa general una vez más"],
+      "auditivo": ["Escucha tus audios de resumen mientras caminas"],
+      "lectoescritura": ["Relee tu hoja de reglas de oro"],
+      "kinestesico": ["Camina 15 minutos y repasa mentalmente los pasos clave"]
+    }
+  },
+  "calming": {
+    "before": "Respiración 4-6 (inhala 4 s, exhala 6 s) durante 2 minutos",
+    "after": "Pausa activa: estira cuello y hombros, camina 3 minutos y bebe agua"
+  }
+}
