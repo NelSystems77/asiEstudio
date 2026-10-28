@@ -54,8 +54,8 @@ export default function SequenceGame({ onDone }: { onDone: (correctRounds: numbe
             onClick={() => tap(i)}
             disabled={phase !== 'input'}
             aria-label={`Cuadro ${i + 1}`}
-            className={`aspect-square rounded-2xl transition ${c} ${lit === i ? 'scale-105 opacity-100 ring-4 ring-white' : 'opacity-40'} ${phase === 'input' ? 'opacity-80 active:opacity-100' : ''}`}
-          />
+            className={`aspect-square rounded-2xl text-3xl font-bold text-white transition ${c} ${lit === i ? 'scale-105 opacity-100 ring-4 ring-white' : 'opacity-40'} ${phase === 'input' ? 'opacity-80 active:opacity-100' : ''}`}
+          >{['①', '②', '③', '④'][i]}</button>
         ))}
       </div>
       <p className="mt-4 h-6 text-sm font-medium" aria-live="polite">

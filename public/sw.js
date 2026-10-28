@@ -1,6 +1,7 @@
-// Service worker: app shell offline + stale-while-revalidate para recursos del mismo origen.
-const CACHE = 'asiestudio-v1';
-const SHELL = ['/', '/index.html', '/manifest.webmanifest', '/icon.svg'];
+// Service Worker. El id de build se inyecta al compilar (ver vite.config.ts) para purgar cachés viejas.
+const CACHE = 'asiestudio-__BUILD_ID__';
+const scope = self.registration.scope; // funciona bajo cualquier base path (p. ej. /asiEstudio/)
+const SHELL = ['', 'index.html', 'manifest.webmanifest', 'icon.svg', 'icon-192.png'].map((p) => new URL(p, scope).href);
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));
@@ -16,14 +17,23 @@ self.addEventListener('activate', (e) => {
 
 self.addEventListener('fetch', (e) => {
   const req = e.request;
-  if (req.method !== 'GET' || new URL(req.url).origin !== location.origin) return;
+  const url = new URL(req.url);
+  if (req.method !== 'GET' || url.origin !== location.origin || !req.url.startsWith(scope)) return;
+
+  // Navegación: red primero (así se recibe la versión nueva), caché si no hay conexión.
+  if (req.mode === 'navigate') {
+    e.respondWith(
+      fetch(req)
+        .then((res) => { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(new URL('index.html', scope).href, copy)); return res; })
+        .catch(() => caches.match(new URL('index.html', scope).href)),
+    );
+    return;
+  }
+  // Recursos (con hash en el nombre): caché primero.
   e.respondWith(
-    caches.open(CACHE).then(async (cache) => {
-      const cached = await cache.match(req);
-      const network = fetch(req)
-        .then((res) => { if (res.ok) cache.put(req, res.clone()); return res; })
-        .catch(() => cached || (req.mode === 'navigate' ? cache.match('/index.html') : undefined));
-      return cached || network;
-    }),
+    caches.match(req).then((hit) => hit || fetch(req).then((res) => {
+      if (res.ok) { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(req, copy)); }
+      return res;
+    })),
   );
 });

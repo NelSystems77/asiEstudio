@@ -4,7 +4,7 @@ import SequenceGame from '../games/SequenceGame';
 import PatternGame from '../games/PatternGame';
 
 export default function Quiz() {
-  const { step, answers, answer, next, back, setGame } = useStore();
+  const { step, draft, answer, next, back, setGame, skipGame } = useStore();
   const id = flow[step];
   const pct = Math.round((step / flow.length) * 100);
   const q = questions.find((x) => x.id === id);
@@ -18,7 +18,7 @@ export default function Quiz() {
           <span>{q ? `Pregunta ${qNum} de ${qTotal}` : 'Mini-reto'}</span><span>{pct}%</span>
         </div>
         <div className="h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800"
-          role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100}>
+          role="progressbar" aria-label="Progreso del diagnóstico" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100}>
           <div className="h-full bg-brand-600 transition-all duration-300" style={{ width: `${pct}%` }} />
         </div>
       </div>
@@ -29,7 +29,7 @@ export default function Quiz() {
             <h2 className="text-xl font-bold leading-snug">{q.text}</h2>
             <div className="mt-5 space-y-3" role="radiogroup" aria-label={q.text}>
               {q.options.map((o, i) => {
-                const sel = answers[q.id] === i;
+                const sel = draft.answers[q.id] === i;
                 return (
                   <button key={i} role="radio" aria-checked={sel}
                     onClick={() => { answer(q.id, i); setTimeout(next, 220); }}
@@ -43,15 +43,19 @@ export default function Quiz() {
             </div>
           </>
         ) : id === 'game:sequence' ? (
-          <SequenceGame onDone={(n) => { setGame({ sequence: n }); next(); }} />
+          <>
+            <SequenceGame onDone={(n) => { setGame('sequence', { sequence: n }); next(); }} />
+            <button className="btn-ghost mx-auto mt-6 flex" onClick={() => { skipGame('sequence'); next(); }}>Omitir este reto</button>
+          </>
         ) : (
-          <PatternGame onDone={(r) => { setGame({ pattern: r }); next(); }} />
+          <>
+            <PatternGame onDone={(r) => { setGame('pattern', { pattern: r }); next(); }} />
+            <button className="btn-ghost mx-auto mt-6 flex" onClick={() => { skipGame('pattern'); next(); }}>Omitir este reto</button>
+          </>
         )}
       </div>
 
-      {step > 0 && q && (
-        <button className="btn-ghost mt-6" onClick={back}>← Anterior</button>
-      )}
+      {step > 0 && q && <button className="btn-ghost mt-6" onClick={back}>← Anterior</button>}
     </div>
   );
 }

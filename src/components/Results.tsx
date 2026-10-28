@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import matrix from '../data/matrix.json';
-import { useStore } from '../store';
+import { selectCurrent, useStore } from '../store';
 import { computeProfile, dimensions, rankedChannels } from '../engine/scoring';
 import { generatePlan, totalMinutes } from '../engine/plan';
+import { formatDay, formatLong, todayISO } from '../engine/dates';
 import type { ArchetypeId, ChannelId } from '../engine/types';
 import Radar from './Radar';
 
@@ -22,10 +23,33 @@ function Bar({ label, value, tone }: { label: string; value: number; tone: strin
 }
 
 export default function Results() {
-  const { answers, games, exam, reset } = useStore();
+  const rec = useStore(selectCurrent);
+  const { goto, progress, toggle } = useStore();
   const [tab, setTab] = useState<'perfil' | 'plan'>('perfil');
-  const profile = useMemo(() => computeProfile(answers, games), [answers, games]);
-  const plan = useMemo(() => generatePlan(profile, exam), [profile, exam]);
+  const profile = useMemo(() => (rec ? computeProfile(rec.answers, rec.games) : null), [rec]);
+  const plan = useMemo(
+    () => (rec && profile ? generatePlan(profile, { days: rec.days, hoursPerDay: rec.exam.hoursPerDay, startDate: rec.startDate }) : null),
+    [rec, profile],
+  );
+  // Al imprimir, los días colapsados deben quedar abiertos.
+  useEffect(() => {
+    const openAll = () => document.querySelectorAll('details').forEach((d) => { d.open = true; });
+    window.addEventListener('beforeprint', openAll);
+    return () => window.removeEventListener('beforeprint', openAll);
+  }, []);
+  if (!rec || !profile || !plan) {
+    return (
+      <div className="card text-center">
+        <p>No hay un diagnóstico seleccionado.</p>
+        <button className="btn-primary mt-4" onClick={() => goto('intro')}>Hacer diagnóstico</button>
+      </div>
+    );
+  }
+  const { games, exam } = rec;
+  const done = progress[rec.id] ?? {};
+  const focusTotal = plan.days.reduce((n, d) => n + d.blocks.filter((b) => b.kind === 'focus').length, 0);
+  const focusDone = Object.keys(done).length;
+  const today = todayISO();
   const a = archetypes[profile.archetype];
   const m = profile.modifiers;
   const tips = [
@@ -43,7 +67,7 @@ export default function Results() {
         <p className="mt-1 opacity-90">{a.tagline}</p>
       </div>
 
-      <div className="mt-4 grid grid-cols-2 gap-2 rounded-xl bg-slate-200 p-1 dark:bg-slate-800" role="tablist">
+      <div className="mt-4 grid grid-cols-2 gap-2 rounded-xl print:hidden bg-slate-200 p-1 dark:bg-slate-800" role="tablist">
         {(['perfil', 'plan'] as const).map((t) => (
           <button key={t} role="tab" aria-selected={tab === t} onClick={() => setTab(t)}
             className={`min-h-[44px] rounded-lg font-semibold transition ${tab === t ? 'bg-white shadow dark:bg-slate-950' : 'text-slate-500'}`}>
@@ -88,32 +112,57 @@ export default function Results() {
       ) : (
         <div className="mt-4 space-y-3">
           <p className="text-sm text-slate-600 dark:text-slate-400">
-            {exam.name ? <b>{exam.name}: </b> : null}{plan.days.length} día(s) · bloques de {plan.focusMinutes} min de enfoque + {plan.breakMinutes} min de pausa.
+            {exam.name ? <b>{exam.name} · </b> : null}examen el {formatLong(exam.examDate)} · {plan.days.length} día(s) desde {formatDay(rec.startDate)} · bloques de {plan.focusMinutes} min + {plan.breakMinutes} min de pausa.
           </p>
-          {plan.days.map((d, i) => (
-            <details key={d.day} open={i === 0} className="card group">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-2">
-                <div>
-                  <p className="text-xs text-slate-500">Día {d.day} · {Math.round(totalMinutes(d))} min</p>
-                  <p className="font-bold">{d.phaseTitle}</p>
-                </div>
-                <span className="transition group-open:rotate-90" aria-hidden>›</span>
-              </summary>
-              <p className="mt-2 text-sm italic text-slate-500">{d.goal}</p>
-              <ol className="mt-3 space-y-2">
-                {d.blocks.map((b, k) => (
-                  <li key={k} className={`flex gap-3 rounded-lg p-3 text-sm ${b.kind === 'focus' ? 'bg-brand-50 dark:bg-brand-700/20' : b.kind === 'calm' ? 'bg-amber-50 dark:bg-amber-500/10' : 'bg-slate-100 dark:bg-slate-800'}`}>
-                    <span className="w-12 shrink-0 font-semibold">{b.minutes}′</span>
-                    <span>{b.text}</span>
-                  </li>
-                ))}
-              </ol>
-            </details>
-          ))}
+          <div>
+            <div className="mb-1 flex justify-between text-xs text-slate-500"><span>Progreso del plan</span><span>{focusDone}/{focusTotal} bloques</span></div>
+            <div className="h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800" role="progressbar" aria-label="Progreso del plan" aria-valuenow={focusDone} aria-valuemin={0} aria-valuemax={focusTotal}>
+              <div className="h-full bg-emerald-500 transition-all" style={{ width: `${focusTotal ? (focusDone / focusTotal) * 100 : 0}%` }} />
+            </div>
+          </div>
+          {plan.days.map((d) => {
+            const dayDone = d.blocks.reduce((n, b, k) => n + (b.kind === 'focus' && done[`${d.day}:${k}`] ? 1 : 0), 0);
+            const dayFocus = d.blocks.filter((b) => b.kind === 'focus').length;
+            const isToday = d.date === today;
+            return (
+              <details key={d.day} open={isToday || (d.date > today && d.day === 1)} className={`card group ${isToday ? 'ring-2 ring-brand-500' : ''}`}>
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-2">
+                  <div>
+                    <p className="text-xs text-slate-500">
+                      {formatDay(d.date)} · Día {d.day} · {Math.round(totalMinutes(d))} min
+                      {isToday && <span className="ml-2 rounded-full bg-brand-600 px-2 py-0.5 text-white">Hoy</span>}
+                    </p>
+                    <p className="font-bold">{d.phaseTitle} <span className="text-xs font-normal text-slate-500">{dayDone}/{dayFocus}</span></p>
+                  </div>
+                  <span className="transition group-open:rotate-90" aria-hidden>›</span>
+                </summary>
+                <p className="mt-2 text-sm italic text-slate-500">{d.goal}</p>
+                <ol className="mt-3 space-y-2">
+                  {d.blocks.map((b, k) => {
+                    const key = `${d.day}:${k}`;
+                    const tone = b.kind === 'focus' ? 'bg-brand-50 dark:bg-brand-700/20' : b.kind === 'calm' ? 'bg-amber-50 dark:bg-amber-500/10' : 'bg-slate-100 dark:bg-slate-800';
+                    return (
+                      <li key={k} className={`rounded-lg text-sm ${tone}`}>
+                        {b.kind === 'focus' ? (
+                          <label className="flex min-h-[44px] cursor-pointer gap-3 p-3">
+                            <input type="checkbox" className="mt-0.5 h-5 w-5 shrink-0 accent-brand-600" checked={!!done[key]} onChange={() => toggle(rec.id, key)} />
+                            <span className={done[key] ? 'line-through opacity-60' : ''}><b>{b.minutes}′</b> · {b.text}</span>
+                          </label>
+                        ) : (
+                          <div className="flex gap-3 p-3"><span className="w-5 shrink-0 text-center" aria-hidden>{b.kind === 'calm' ? '🧘' : '☕'}</span><span><b>{b.minutes}′</b> · {b.text}</span></div>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ol>
+              </details>
+            );
+          })}
+          <button className="btn-ghost w-full print:hidden" onClick={() => window.print()}>Imprimir / guardar como PDF</button>
         </div>
       )}
 
-      <button className="btn-ghost mt-6 w-full" onClick={reset}>Repetir diagnóstico</button>
+      <button className="btn-ghost mt-6 w-full print:hidden" onClick={() => goto('intro')}>Nuevo diagnóstico</button>
     </div>
   );
 }
