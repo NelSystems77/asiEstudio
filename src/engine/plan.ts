@@ -1,11 +1,21 @@
 import matrix from '../data/matrix.json';
+import { addDays, daysBetween } from './dates';
 import { rankedChannels } from './scoring';
-import type { ChannelId, ExamSetup, PhaseId, PlanBlock, PlanDay, Profile, StudyPlan } from './types';
+import type { ChannelId, PhaseId, PlanBlock, PlanDay, Profile, StudyPlan } from './types';
 
 type PlaybookEntry = { title: string; goal: string; general: string[] } & Record<ChannelId, string[]>;
 const playbook = matrix.playbook as unknown as Record<PhaseId, PlaybookEntry>;
 
 export const MAX_PLAN_DAYS = 60;
+
+export interface PlanWindow { startDate: string; days: number }
+
+/** Ventana del plan: desde hoy hasta el día previo al examen (máx. 60 días, mínimo 1). */
+export function planWindow(today: string, examDate: string): PlanWindow {
+  const days = Math.max(1, Math.min(MAX_PLAN_DAYS, daysBetween(today, examDate)));
+  const startDate = daysBetween(today, examDate) > MAX_PLAN_DAYS ? addDays(examDate, -MAX_PLAN_DAYS) : today;
+  return { startDate, days };
+}
 
 export function phaseForDay(i: number, total: number): PhaseId {
   if (total === 1) return 'simulacro';
@@ -24,9 +34,12 @@ export function blockLengths(p: Profile): { focus: number; rest: number } {
   return { focus: 25, rest: 5 };
 }
 
-export function generatePlan(profile: Profile, exam: ExamSetup): StudyPlan {
+export function generatePlan(
+  profile: Profile,
+  opts: { days: number; hoursPerDay: number; startDate: string },
+): StudyPlan {
   const { focus, rest } = blockLengths(profile);
-  const total = Math.max(1, Math.min(MAX_PLAN_DAYS, Math.floor(exam.days)));
+  const total = Math.max(1, Math.min(MAX_PLAN_DAYS, Math.floor(opts.days)));
   const channels = profile.archetype === 'multimodal'
     ? rankedChannels(profile.pct)
     : [profile.archetype as ChannelId, ...rankedChannels(profile.pct).filter((c) => c !== profile.archetype)];
@@ -36,7 +49,7 @@ export function generatePlan(profile: Profile, exam: ExamSetup): StudyPlan {
     const phase = phaseForDay(i, total);
     const pb = playbook[phase];
     // Si es el último día, o hay ansiedad alta, se alivia la carga.
-    const hours = phase === 'final' ? Math.min(exam.hoursPerDay, 1.5) : exam.hoursPerDay;
+    const hours = phase === 'final' ? Math.min(opts.hoursPerDay, 1.5) : opts.hoursPerDay;
     const slots = Math.max(1, Math.floor((hours * 60) / (focus + rest)));
 
     // Actividades: se rota el canal; multimodal rota por bloque, los demás priorizan su canal.
@@ -62,7 +75,7 @@ export function generatePlan(profile: Profile, exam: ExamSetup): StudyPlan {
     if (profile.modifiers.lowOrganization) {
       blocks.push({ minutes: 3, kind: 'calm', text: 'Cierre: anota qué harás mañana y a qué hora empiezas' });
     }
-    days.push({ day: i + 1, phase, phaseTitle: pb.title, goal: pb.goal, blocks });
+    days.push({ day: i + 1, date: addDays(opts.startDate, i), phase, phaseTitle: pb.title, goal: pb.goal, blocks });
   }
   return { focusMinutes: focus, breakMinutes: rest, days };
 }

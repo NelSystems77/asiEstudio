@@ -16,3 +16,7 @@
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
 }
+@media print {
+  body { background: #fff; color: #000; }
+  .card { break-inside: avoid; box-shadow: none; }
+}
